@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-# In-memory for now; resets whenever the server restarts.
 items: list[dict] = []
 
 class ItemIn(BaseModel):
