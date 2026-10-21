@@ -1,33 +1,19 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { api } from './api';
 
 export default function App() {
-  const [url, setUrl] = useState('');
-  const [shortUrl, setShortUrl] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  async function shorten(e: FormEvent) {
-    e.preventDefault();
-    setError('');
-    try {
-      const link = await api<{ short_url: string }>('/links', {
-        method: 'POST',
-        body: JSON.stringify({ url }),
-      });
-      setShortUrl(link.short_url);
-    } catch (err) {
-      setError((err as Error).message);
-    }
-  }
+  useEffect(() => {
+    api<string>('/hello')
+      .then(setMessage)
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
-  return (
-    <div>
-      <form onSubmit={shorten}>
-        <input value={url} onChange={(e) => setUrl(e.target.value)} />
-        <button>Shorten</button>
-      </form>
-      {error && <p>{error}</p>}
-      {shortUrl && <p>{shortUrl}</p>}
-    </div>
-  );
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+  return <p>Hello, {message}</p>;
 }
